@@ -1,0 +1,98 @@
+---
+title: |
+  <b>gghighlight</b> の</br>
+  　作者です。</br>
+  <span style="color: #F8F8F2;">すべて</span>を</br>
+  　お話しします。
+author: "@yutannihilation"
+format:
+  revealjs:
+    theme: ["default", "dracula.scss"]
+highlight-style: "dracula"
+execute: 
+  echo: true
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(dev = "ragg_png")
+```
+
+
+## ドーモ！
+
+::: columns
+::: {.column width="50%"}
+![](images/icon.jpg){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+
+Hiroaki Yutani
+
+- Twitter: [@yutannihilation](https://twitter.com/yutannihilation)
+- 好きな言語：R、忍殺語
+- ggplot2 のメンテナ
+- 「Rユーザのための RStudio［実践］入門」のデータ前処理の章を担当
+
+:::
+:::
+
+## あれから5年...
+
+伝説の Hadley Wickham 緊急来日回
+
+[![](images/slide-2018.png)](https://speakerdeck.com/yutannihilation/introduction-to-gghighlight)
+
+## あれから5年...
+
+そういえば日本語で発表したことがなかった！
+
+## 今日話すこと
+
+* gghighlightの使い方
+* gghighlightを使わずにやるとどうなるか
+
+# <b>gghighlight</b>の使い方
+
+## こんなデータに出会ってしまったら、どうしますか？
+
+```{r}
+#| label: "plot1"
+#| code-fold: true
+set.seed(2)
+d <- purrr::map_dfr(
+  letters,
+  ~ data.frame(
+      idx = 1:400,
+      value = cumsum(runif(400, -1, 1)),
+      type = .,
+      flag = sample(c(TRUE, FALSE), size = 400, replace = TRUE),
+      stringsAsFactors = FALSE
+    )
+)
+
+library(ggplot2)
+library(gghighlight)
+
+ggplot(d) +
+  geom_line(aes(idx, value, colour = type))
+```
+
+## {}
+
+```{r}
+ggplot(d, aes(idx, value, colour = type)) +
+  geom_line()
+
+```
+
+## {}
+
+```{r}
+#| code-line-numbers: "3"
+ggplot(d, aes(idx, value, colour = type)) +
+  geom_line() +
+  gghighlight(max(value) > 19)
+```
+
