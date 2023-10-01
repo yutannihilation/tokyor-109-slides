@@ -11,6 +11,7 @@ format:
 highlight-style: "dracula"
 execute: 
   echo: true
+  warning: false
 ---
 
 ```{r}
@@ -19,9 +20,12 @@ knitr::opts_chunk$set(dev = "ragg_png")
 
 library(ggplot2)
 library(ggrepel)
+library(patchwork)
 
 update_geom_defaults("label_repel", list(size = 20 / .pt))
 theme_set(theme_gray(base_size = 20))
+
+update_geom_defaults("point", list(size = 3))
 ```
 
 
@@ -61,6 +65,12 @@ Hiroaki Yutani
 * gghighlightを使わずにやるとどうなるか
 
 # <b>gghighlight</b>の使い方
+
+## gghighlightとは
+
+* 条件に当てはまるデータをハイライトするためのRパッケージ
+  * 条件は `dplyr::filter()` と同じルールで評価される^[というか、内部では`dplyr::filter()`を使っている]
+* あのHadley公式[ggplot2本（第三版）](https://ggplot2-book.org/annotations.html#direct-labelling)^[権利関係の問題なのか、永遠に日本語版が出ない...]にも紹介されている定番パッケージ
 
 ## 🍝
 
@@ -115,12 +125,6 @@ ggplot(data, aes(x, y, colour = type)) +
   geom_line() +
   gghighlight(max(y) >= 20)
 ```
-## gghighlightとは
-
-* 条件式に当てはまるデータ系列をハイライトするためのRパッケージ
-  * 条件式は `dplyr::filter()` と同じルール^[というか、内部では`dplyr::filter()`を使っている]
-* あのHadley公式[ggplot2本（第三版）](https://ggplot2-book.org/annotations.html#direct-labelling)^[権利関係の問題なのか、永遠に日本語版が出ない]にも紹介されている定番パッケージ
-
 
 ## インストール
 
@@ -131,8 +135,357 @@ CRANからインストールできます。
 install.packages("gghighlight")
 ```
 
-## gghighlight の誤解されがちなところ
+## 基本的な使い方
 
-* データ探索のためのパッケージ
-* gghighlight はただのショートカット。gghighlight でできることは 素の ggplot2 でもできる。
+* 通常のggplotのオブジェクトに`+`で足すだけ
+* だいたいのGeomに使える
+* 条件には任意の表現が書ける
+* 条件は複数指定できる
 
+```{r}
+#| eval: false
+ggplotのオブジェクト +
+  gghighlight(条件1, 条件2, ...)
+```
+
+## 条件の例
+
+* `y`の最大値が20以上の線をハイライトする
+
+```{r}
+#| eval: false
+gghighlight(max(y) >= 20)
+```
+
+* `y`の最大値が20以上、かつ最小値が0以上の線
+
+```{r}
+#| eval: false
+gghighlight(max(y) >= 20, min(y) >= 0)
+```
+
+* レコード数が100以上の線
+
+```{r}
+#| eval: false
+gghighlight(n() > 100)
+```
+
+## `geom_bar()`の例
+
+`price`の平均が4000以上をハイライト
+
+```{r}
+#| eval: false
+ggplot(diamonds, aes(cut, fill = cut)) +
+  geom_bar() +
+  gghighlight(mean(price) >= 4000)
+```
+
+```{r}
+#| label: "geom_bar"
+#| echo: false
+#| layout-ncol: 2
+p1 <- ggplot(diamonds, aes(cut, fill = cut)) +
+  geom_bar()
+p2 <- p1 + gghighlight(mean(price) >= 4000)
+
+p1 + ggtitle("before")
+p2 + ggtitle("after")
+```
+
+## `geom_point()`の例
+
+`disp`が200以上をハイライト
+
+```{r}
+#| eval: false
+mtcars$cyl <- factor(mtcars$cyl)
+ggplot(mtcars, aes(wt, mpg, colour = cyl)) +
+  geom_point(alpha = 0.85) +
+  gghighlight(disp >= 200)
+```
+
+```{r}
+#| label: "geom_point"
+#| echo: false
+#| layout-ncol: 2
+mtcars$cyl <- factor(mtcars$cyl)
+p1 <- ggplot(mtcars, aes(wt, mpg, colour = cyl)) +
+  geom_point(alpha = 0.85)
+p2 <- p1 + gghighlight(disp >= 200)
+
+p1 + ggtitle("before")
+p2 + ggtitle("after")
+```
+
+
+## `geom_sf()`の例
+
+`AREA`が0.20以上をハイライト
+
+```{r}
+#| eval: false
+ggplot(nc) +
+  geom_sf(aes(fill = AREA)) +
+  gghighlight(AREA >= 0.20)
+```
+
+```{r}
+#| label: "geom_sf"
+#| echo: false
+#| layout-ncol: 2
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+p1 <- ggplot(nc) +
+  geom_sf(aes(fill = AREA)) +
+  theme(legend.position = "top", legend.key.width = unit(40, "pt"))
+p2 <- p1 + gghighlight(AREA >= 0.20)
+
+p1 + ggtitle("before")
+p2 + ggtitle("after")
+```
+
+## どういうGeomに使えるの？
+
+* だいたい使えるはず
+* 正確には、「同じデータからは必ず同じ図形が描かれる」なら使える
+  * 既知のダメな例は`position_dodge()`
+
+## `geom_boxplot()`の例
+
+ひとつのboxplotの幅は、その目盛りで横並びになるべきカテゴリの数で決まる。
+絞り込まれてカテゴリ数が変わると、幅が違ってうまく重ならない。
+
+```{r}
+#| label: "geom_boxplot"
+#| output-location: slide
+mpg$cyl <- factor(mpg$cyl)
+ggplot(mpg, aes(class, hwy, colour = cyl)) +
+  geom_boxplot(alpha = 0.3) +
+  gghighlight(
+    max(hwy) > 40,
+    unhighlighted_params = list(
+      colour = "grey40"
+    )
+  )
+```
+
+## 条件の種類
+
+* `geom_point()`や`geom_sf()`など、1つのレコードが1つの図形を描くGeom
+
+::: {.fragment}
+→ レコードごとに計算される条件（例：`disp >= 200`、`AREA >= 0.20`）
+:::
+
+* `geom_line()`や`geom_bar()`など、複数のレコードから1つの図形を描くGeom
+
+::: {.fragment}
+→ グループごとに計算される条件（例：`mean(price) >= 4000`、`n() > 100`）
+:::
+
+## 条件の種類
+
+* えっ、難しくてどっちを選べばいいかわからない...><
+
+→ `gghighlight()`は自動でどっちの計算も試して、うまくいった方を採用するので雰囲気で使って大丈夫！
+
+## `use_group_by`
+
+* 自動で計算してくれるのはありがたいんですが、この警告メッセージがうざいんですけど
+
+```{r}
+#> Warning message:
+#> Tried to calculate with group_by(), but the calculation failed.
+#> Falling back to ungrouped filter operation... 
+```
+
+→ `use_group_by`を明示的に指定しよう
+
+```{r}
+#| eval: false
+  gghighlight(disp >= 200,
+    use_group_by = FALSE
+  )
+```
+
+
+## `TRUE`/`FALSE`がすべてではない
+
+ここまで、わかりやすいように「条件」と書いてきたが、実は`TRUE`/`FALSE`でなくてもいい
+
+* 結果が数字や文字列の場合は、その値でデータを並べ替えて上位のレコード/グループをハイライトする
+* ハイライトする数は、`max_highlight`で変えられる（デフォルトは5）
+
+```{r}
+#| label: "non-logical-predicates"
+#| output-location: slide
+#| code-line-numbers: "4"
+mtcars$cyl <- factor(mtcars$cyl)
+ggplot(mtcars, aes(wt, mpg, colour = cyl)) +
+  geom_point() +
+  gghighlight(disp, max_highlight = 3)
+```
+
+# 結果のカスタマイズ
+
+## ポイント
+
+1. `gghighlight()`の結果は通常のggplotオブジェクトなので、好きなようにいじれる
+2. ハイライトのされ方を変えるには、`unhighlighted_params`
+3. `gghighlight()`の対象から外したいレイヤーは、`gghighlight()`の後に重ねる
+
+## 余談：個人的に思ってること
+
+* gghighlightのメインの目的は**データの探索**
+* gghighlightはただのショートカットで、gghighlightでできることはgghighlightを使わなくてもできる
+
+→ 複雑な図をつくりたいのであれば、gghighlightを使わないでやった方がいいかも
+
+## `gghighlight()`の結果はggplot
+
+`+`でテーマを変えたり、patchworkしたりできる。
+
+```{r}
+#| include: false
+
+# tweak
+theme_minimal <- function(...) ggplot2::theme_minimal(..., base_size = 20)
+```
+
+
+```{r}
+#| label: "change-theme"
+#| output-location: slide
+p1 <- ggplot(data, aes(x, y, colour = type)) +
+  geom_line()
+
+p2 <- p1 + gghighlight(max(y) > 19) +
+  theme_minimal() +
+  ggtitle("変わり果てた姿")
+
+patchwork::wrap_plots(p1, p2)
+```
+
+## facetが便利
+
+グレーになった部分は全facetに表示される
+
+```{r}
+#| label: "change-facet"
+p2 + facet_wrap(vars(type))
+```
+
+## facetが便利
+
+なんなら、このためだけに空の`gghighlight()`を使うまである
+
+```{r}
+#| label: "change-facet-asis"
+#| output-location: slide
+#| code-line-numbers: "4"
+mtcars$cyl <- factor(mtcars$cyl)
+ggplot(mpg, aes(displ, hwy, colour = cyl)) +
+  geom_point() + 
+  gghighlight() + 
+  facet_wrap(vars(cyl))
+```
+
+## `unhighlighted_params`
+
+グレーアウト部分の任意のパラメータを上書きできる
+
+```{r}
+#| label: "params"
+#| output-location: slide
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line(linewidth = 3, alpha = 0.7) +    # <1>
+  gghighlight(max(y) > 19,
+    unhighlighted_params = list(
+      linewidth = 1             # <2>
+    )
+  )
+```
+
+1. 元の`linewidth`は太目に
+2. グレーアウト部分の`linewidth`は細目で上書きする
+
+## `unhighlighted_params`
+
+`NULL`を指定してグレーアウトを取り消すこともできる
+
+```{r}
+#| label: "params-null"
+#| output-location: slide
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line(linewidth = 1.3) +
+  gghighlight(max(y) > 19,
+    unhighlighted_params = list(
+      colour = NULL, # <1>
+      alpha = 0.2    # <2>
+    ),
+    keep_scales = TRUE # <3>
+  )
+```
+
+
+1. 色は元のままにする
+2. ただし透明度を上げる
+3. （次に説明）
+
+## `keep_scales`
+
+`gghighlight()`は、絞り込んだ後のデータに色を割り当てるので、元のプロットの色とは一致しない。
+`keep_scales = TRUE`を指定すれば、元の色と合わせることができる。
+
+```{r}
+mtcars$cyl <- factor(mtcars$cyl)
+A <- ggplot(mtcars, aes(wt, mpg, colour = cyl)) +
+  geom_point()
+
+B <- A + gghighlight(disp)
+
+C <- A +
+  gghighlight(disp, keep_scales = TRUE)
+```
+## `keep_scales`
+
+```{r}
+#| label: "keep_scales"
+#| fig-cap: "A: オリジナル、B: 通常、C: `keep_scales=TRUE`"
+#| echo: false
+wrap_plots(A, B, C) + plot_annotation(tag_levels = "A")
+```
+
+## `gghighlight()`は順序が重要
+
+`gghighlight()`は通常のggplotの関数と同じく`+`で足せるが、**中身はぜんぜん違う**
+
+* ggplotのレイヤーは、そのプロットを表示する直前に評価されるが、`gghighlight()`は`+`された時点で処理が実行される
+* なので、`gghighlight()`より後に`+`されたレイヤーに対しては`gghighlight()`の力は及ばない
+* ただし、ggplotオブジェクトが保持するデータは条件を満たすもののみに絞り込まれているので、元のデータを参照するには`data`引数に元のデータを渡す必要がある
+
+## `gghighlight()`は順序が重要
+
+```{r}
+#| label: "order-of-gghighlight"
+#| output-location: slide
+data2 <- tibble::tibble(
+  x = rep(1:3, each = 3),
+  type = rep(1:3, times = 3),
+  y = x * type
+)
+data2$type <- factor(data2$type)
+
+ggplot(data2, aes(x, y, colour = type)) +
+  geom_line() +
+  gghighlight(max(y) >= 9) +
+  geom_point(data = data2) # <1>
+```
+1. このレイヤーはグレーアウトしない
+
+## ラベルをカスタマイズする
+
+* `use_direct_label`
+* `label_params`
+* `line_label_type`
