@@ -425,7 +425,10 @@
 </section>
 <section id="あれから5年-1" class="slide level2">
 <h2>あれから5年…</h2>
-<p>そういえば日本語で発表したことがなかった！</p>
+<ul>
+<li>そういえば日本語で発表したことがなかった！</li>
+<li>あと、英語力と時間の問題で簡単な機能紹介だけだったので、今日はフルバージョンでお届けします！</li>
+</ul>
 </section>
 <section id="今日話すこと" class="slide level2">
 <h2>今日話すこと</h2>
@@ -439,17 +442,17 @@
 <h1><b>gghighlight</b>の使い方</h1>
 
 </section>
-<section id="こんなデータに出会ってしまったらどうしますか" class="slide level2">
-<h2>こんなデータに出会ってしまったら、どうしますか？</h2>
+<section id="section" class="slide level2">
+<h2>🍝</h2>
 <div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>d <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dfr</span>(</span>
+<span id="cb1-2"><a href="#cb1-2"></a>data <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dfr</span>(</span>
 <span id="cb1-3"><a href="#cb1-3"></a>  letters,</span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="sc">~</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-5"><a href="#cb1-5"></a>      <span class="at">idx =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">400</span>,</span>
-<span id="cb1-6"><a href="#cb1-6"></a>      <span class="at">value =</span> <span class="fu">cumsum</span>(<span class="fu">runif</span>(<span class="dv">400</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb1-5"><a href="#cb1-5"></a>      <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">400</span>,</span>
+<span id="cb1-6"><a href="#cb1-6"></a>      <span class="at">y =</span> <span class="fu">cumsum</span>(<span class="fu">runif</span>(<span class="dv">400</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)),</span>
 <span id="cb1-7"><a href="#cb1-7"></a>      <span class="at">type =</span> .,</span>
 <span id="cb1-8"><a href="#cb1-8"></a>      <span class="at">flag =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>), <span class="at">size =</span> <span class="dv">400</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb1-9"><a href="#cb1-9"></a>      <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
@@ -459,32 +462,70 @@
 <span id="cb1-13"><a href="#cb1-13"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-14"><a href="#cb1-14"></a><span class="fu">library</span>(gghighlight)</span>
 <span id="cb1-15"><a href="#cb1-15"></a></span>
-<span id="cb1-16"><a href="#cb1-16"></a><span class="fu">ggplot</span>(d) <span class="sc">+</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(idx, value, <span class="at">colour =</span> type))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y, <span class="at">colour =</span> type)) <span class="sc">+</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/plot1-1.png" width="960" class="r-stretch"></section>
-<section id="section" class="slide level2">
+<img data-src="index_files/figure-revealjs/plot1-orig-1.png" width="960" class="r-stretch"></section>
+<section id="section-1" class="slide level2">
+<h2>🍝</h2>
+<ul>
+<li>色が多すぎて見分けられない
+<ul>
+<li>色は6色くらいが望ましい、とされている <sup>1</sup></li>
+</ul></li>
+<li>でも、値の分布を示すためにも、データを絞り込みたくはない</li>
+</ul>
+<div class="fragment">
+<p>→ gghighlightの出番です！</p>
+</div>
+<aside><ol class="aside-footnotes"><li id="fn1"><p>あまり明確な根拠はないらしい。参考： <a href="https://policyviz.com/2023/05/31/why-are-six-colors-common-in-color-palettes-for-data-visualization/">Why are six colors common in color palettes for data visualization? - PolicyViz</a></p></li></ol></aside></section>
+<section id="section-2" class="slide level2">
 <h2></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">ggplot</span>(d, <span class="fu">aes</span>(idx, value, <span class="at">colour =</span> type)) <span class="sc">+</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y, <span class="at">colour =</span> type)) <span class="sc">+</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
-<section id="section-1" class="slide level2">
+<img data-src="index_files/figure-revealjs/plot1-1.png" width="960" class="r-stretch"></section>
+<section id="section-3" class="slide level2">
 <h2></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3" data-code-line-numbers="3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">ggplot</span>(d, <span class="fu">aes</span>(idx, value, <span class="at">colour =</span> type)) <span class="sc">+</span></span>
+<div class="sourceCode cell-code" id="cb3" data-code-line-numbers="3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y, <span class="at">colour =</span> type)) <span class="sc">+</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a>  <span class="fu">gghighlight</span>(<span class="fu">max</span>(value) <span class="sc">&gt;</span> <span class="dv">19</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="fu">gghighlight</span>(<span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"><div class="footer footer-default">
+<img data-src="index_files/figure-revealjs/plot1_hl-1.png" width="960" class="r-stretch"></section>
+<section id="gghighlightとは" class="slide level2">
+<h2>gghighlightとは</h2>
+<ul>
+<li>条件式に当てはまるデータ系列をハイライトするためのRパッケージ
+<ul>
+<li>条件式は <code>dplyr::filter()</code> と同じルール<sup>1</sup></li>
+</ul></li>
+<li>あのHadley公式<a href="https://ggplot2-book.org/annotations.html#direct-labelling">ggplot2本（第三版）</a><sup>2</sup>にも紹介されている定番パッケージ</li>
+</ul>
+<aside><ol class="aside-footnotes"><li id="fn2"><p>というか、内部では<code>dplyr::filter()</code>を使っている</p></li><li id="fn3"><p>権利関係の問題なのか、永遠に日本語版が出ない</p></li></ol></aside></section>
+<section id="インストール" class="slide level2">
+<h2>インストール</h2>
+<p>CRANからインストールできます。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">install.packages</span>(<span class="st">"gghighlight"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="gghighlight-の誤解されがちなところ" class="slide level2">
+<h2>gghighlight の誤解されがちなところ</h2>
+<ul>
+<li>データ探索のためのパッケージ</li>
+<li>gghighlight はただのショートカット。gghighlight でできることは 素の ggplot2 でもできる。</li>
+</ul>
+<div class="footer footer-default">
 
 </div>
 </section></section>
+
     </div>
   </div>
 

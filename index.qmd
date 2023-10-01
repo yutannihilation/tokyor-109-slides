@@ -16,6 +16,12 @@ execute:
 ```{r}
 #| include: false
 knitr::opts_chunk$set(dev = "ragg_png")
+
+library(ggplot2)
+library(ggrepel)
+
+update_geom_defaults("label_repel", list(size = 20 / .pt))
+theme_set(theme_gray(base_size = 20))
 ```
 
 
@@ -46,7 +52,8 @@ Hiroaki Yutani
 
 ## あれから5年...
 
-そういえば日本語で発表したことがなかった！
+* そういえば日本語で発表したことがなかった！
+* あと、英語力と時間の問題で簡単な機能紹介だけだったので、今日はフルバージョンでお届けします！
 
 ## 今日話すこと
 
@@ -55,17 +62,17 @@ Hiroaki Yutani
 
 # <b>gghighlight</b>の使い方
 
-## こんなデータに出会ってしまったら、どうしますか？
+## 🍝
 
 ```{r}
-#| label: "plot1"
+#| label: "plot1-orig"
 #| code-fold: true
 set.seed(2)
-d <- purrr::map_dfr(
+data <- purrr::map_dfr(
   letters,
   ~ data.frame(
-      idx = 1:400,
-      value = cumsum(runif(400, -1, 1)),
+      x = 1:400,
+      y = cumsum(runif(400, -1, 1)),
       type = .,
       flag = sample(c(TRUE, FALSE), size = 400, replace = TRUE),
       stringsAsFactors = FALSE
@@ -75,24 +82,57 @@ d <- purrr::map_dfr(
 library(ggplot2)
 library(gghighlight)
 
-ggplot(d) +
-  geom_line(aes(idx, value, colour = type))
-```
-
-## {}
-
-```{r}
-ggplot(d, aes(idx, value, colour = type)) +
+ggplot(data, aes(x, y, colour = type)) +
   geom_line()
+```
 
+## 🍝
+
+* 色が多すぎて見分けられない
+   * 色は6色くらいが望ましい、とされている [^six-color]
+* でも、値の分布を示すためにも、データを絞り込みたくはない
+
+::: {.fragment}
+→ gghighlightの出番です！
+:::
+
+[^six-color]: あまり明確な根拠はないらしい。参考： [Why are six colors common in color palettes for data visualization? - PolicyViz](https://policyviz.com/2023/05/31/why-are-six-colors-common-in-color-palettes-for-data-visualization/)
+
+## {}
+
+```{r}
+#| label: "plot1"
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line()
 ```
 
 ## {}
 
 ```{r}
+#| label: "plot1_hl"
 #| code-line-numbers: "3"
-ggplot(d, aes(idx, value, colour = type)) +
+ggplot(data, aes(x, y, colour = type)) +
   geom_line() +
-  gghighlight(max(value) > 19)
+  gghighlight(max(y) >= 20)
 ```
+## gghighlightとは
+
+* 条件式に当てはまるデータ系列をハイライトするためのRパッケージ
+  * 条件式は `dplyr::filter()` と同じルール^[というか、内部では`dplyr::filter()`を使っている]
+* あのHadley公式[ggplot2本（第三版）](https://ggplot2-book.org/annotations.html#direct-labelling)^[権利関係の問題なのか、永遠に日本語版が出ない]にも紹介されている定番パッケージ
+
+
+## インストール
+
+CRANからインストールできます。
+
+```{r}
+#| eval: false
+install.packages("gghighlight")
+```
+
+## gghighlight の誤解されがちなところ
+
+* データ探索のためのパッケージ
+* gghighlight はただのショートカット。gghighlight でできることは 素の ggplot2 でもできる。
 
