@@ -437,6 +437,32 @@
 <li>gghighlightを使わずにやるとどうなるか</li>
 </ul>
 </section>
+<section id="表記について" class="slide level2">
+<h2>※表記について</h2>
+<p>このスライドでは合字フォントを使っています。 慣れていないと読みづらいかもです。すみません！</p>
+<table>
+<thead>
+<tr class="header">
+<th>表示</th>
+<th>実際の文字</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&lt;=</code></td>
+<td><code>&lt;</code> <code>=</code> （小なりイコール）</td>
+</tr>
+<tr class="even">
+<td><code>&lt;-</code></td>
+<td><code>&lt;</code> <code>-</code> （代入）</td>
+</tr>
+<tr class="odd">
+<td><code>|&gt;</code></td>
+<td><code>|</code> <code>&gt;</code> （パイプ演算子）</td>
+</tr>
+</tbody>
+</table>
+</section>
 <section>
 <section id="gghighlightの使い方" class="title-slide slide level1 center">
 <h1><strong>gghighlight</strong>の使い方</h1>
@@ -937,27 +963,214 @@
 </section>
 <section id="gghighlight-を使わずにやってみる" class="slide level2">
 <h2>gghighlight を使わずにやってみる</h2>
+<p>まず、条件を満たさない値を<code>NA</code>で置き換える。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb25-2"><a href="#cb25-2"></a></span>
-<span id="cb25-3"><a href="#cb25-3"></a>data_tweak <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
-<span id="cb25-4"><a href="#cb25-4"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb25-5"><a href="#cb25-5"></a>    <span class="at">flag =</span> <span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">20</span>,</span>
-<span id="cb25-6"><a href="#cb25-6"></a>    <span class="at">colour =</span> <span class="fu">if_else</span>(flag, type, <span class="cn">NA</span>),</span>
-<span id="cb25-7"><a href="#cb25-7"></a>    <span class="at">.by =</span> type</span>
-<span id="cb25-8"><a href="#cb25-8"></a>  )</span>
-<span id="cb25-9"><a href="#cb25-9"></a></span>
-<span id="cb25-10"><a href="#cb25-10"></a><span class="fu">ggplot</span>(data_tweak) <span class="sc">+</span></span>
-<span id="cb25-11"><a href="#cb25-11"></a>  <span class="fu">aes</span>(x, y, <span class="at">colour =</span> colour, <span class="at">group =</span> type) <span class="sc">+</span></span>
-<span id="cb25-12"><a href="#cb25-12"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb25-13"><a href="#cb25-13"></a>  <span class="fu">scale_colour_discrete</span>(<span class="at">na.value =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="annotated-cell-26"><pre class="sourceCode numberSource r code-annotation-code number-lines code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-26-1"><a href="#annotated-cell-26-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="annotated-cell-26-2"><a href="#annotated-cell-26-2"></a></span>
+<span id="annotated-cell-26-3"><a href="#annotated-cell-26-3"></a>data_tweak <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-26-4"><a href="#annotated-cell-26-4"></a>  <span class="fu">mutate</span>(</span>
+<span id="annotated-cell-26-5"><a href="#annotated-cell-26-5"></a>    <span class="at">flag =</span> <span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">20</span>,</span>
+<span id="annotated-cell-26-6"><a href="#annotated-cell-26-6"></a>    <span class="at">bleached =</span> <span class="fu">if_else</span>(flag, type, <span class="cn">NA</span>),</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-26" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-26-7" class="code-annotation-target"><a href="#annotated-cell-26-7"></a>    <span class="at">.by =</span> type</span>
+<span id="annotated-cell-26-8"><a href="#annotated-cell-26-8"></a>  )</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-26" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-26" data-code-lines="7" data-code-annotation="1"><code>type</code>ごとに集計</span>
+</dd>
+</dl>
+</div>
+</div>
+</section>
+<section id="gghighlight-を使わずにやってみる-1" class="slide level2">
+<h2>gghighlight を使わずにやってみる</h2>
+<p><code>NA</code>にグレーを割り当てる。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-27"><pre class="sourceCode numberSource r code-annotation-code number-lines code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-27-1"><a href="#annotated-cell-27-1"></a><span class="fu">ggplot</span>(data_tweak) <span class="sc">+</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-27" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-27-2" class="code-annotation-target"><a href="#annotated-cell-27-2"></a>  <span class="fu">aes</span>(x, y, <span class="at">colour =</span> bleached, <span class="at">group =</span> type) <span class="sc">+</span></span>
+<span id="annotated-cell-27-3"><a href="#annotated-cell-27-3"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="annotated-cell-27-4"><a href="#annotated-cell-27-4"></a>  <span class="fu">scale_colour_discrete</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-27" data-target-annotation="2" onclick="event.preventDefault();" href="">2</a><span id="annotated-cell-27-5" class="code-annotation-target"><a href="#annotated-cell-27-5"></a>    <span class="at">na.value =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>)</span>
+<span id="annotated-cell-27-6"><a href="#annotated-cell-27-6"></a>  )</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-27" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-27" data-code-lines="2" data-code-annotation="1"><code>colour=bleached</code>だけだと<code>NA</code>で1本の線になってしまう。<code>group</code>を明示的に指定する。</span>
+</dd>
+<dt data-target-cell="annotated-cell-27" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-27" data-code-lines="5" data-code-annotation="2"><code>NA</code>の値は<code>na.value</code>で指定できる。</span>
+</dd>
+</dl>
+</div>
 </div>
 
-</section><section id="gghighlight-を使わずにやってみる-output" class="slide level2 output-location-slide"><h2>gghighlight を使わずにやってみる</h2><div class="cell output-location-slide">
+</section>
+<section id="gghighlight-を使わずにやってみる-1-output" class="slide level2 output-location-slide"><h2>gghighlight を使わずにやってみる</h2><div class="cell output-location-slide">
 <div class="cell-output-display">
-<p><img data-src="index_files/figure-revealjs/no-gghighlight-1.png" width="960"></p>
+<p><img data-src="index_files/figure-revealjs/no-gghighlight1-1.png" width="960"></p>
 </div>
-</div></section></section>
+</div></section><section id="gghighlight-を使わずにやってみる-2" class="slide level2">
+<h2>gghighlight を使わずにやってみる</h2>
+<p>このタイプの方法（色の塗り分けで対応）は、わかりやすいが、facetできないという欠点がある。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">last_plot</span>() <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(bleached))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="index_files/figure-revealjs/no-gghighlight-facet-1.png" width="960" class="r-stretch"></section>
+<section id="facet-できるようにする" class="slide level2">
+<h2>facet できるようにする</h2>
+<p><code>facet_*()</code>は、引数に指定した名前の列が含まれるデータは分割するが、含まれないデータは全facetに描く。 これを利用するため、分割されないように列名を変えたバージョンをつくる。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>bleached <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">rename</span>(<span class="at">TYPE =</span> type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>また、ハイライトするデータに絞ったバージョンもつくる。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>colourful <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a>  <span class="fu">filter</span>(<span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">20</span>, <span class="at">.by =</span> type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="facet-できるようにする-1" class="slide level2">
+<h2>facet できるようにする</h2>
+<p>この2つのデータを別々の<code>geom_line()</code>として重ね合わせる。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">ggplot</span>(<span class="cn">NULL</span>, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb28-3"><a href="#cb28-3"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">group =</span> TYPE),</span>
+<span id="cb28-4"><a href="#cb28-4"></a>    <span class="at">data =</span> bleached,</span>
+<span id="cb28-5"><a href="#cb28-5"></a>    <span class="at">colour =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>)</span>
+<span id="cb28-6"><a href="#cb28-6"></a>  ) <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb28-8"><a href="#cb28-8"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">colour =</span> type),</span>
+<span id="cb28-9"><a href="#cb28-9"></a>    <span class="at">data =</span> colourful</span>
+<span id="cb28-10"><a href="#cb28-10"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="facet-できるようにする-1-output" class="slide level2 output-location-slide"><h2>facet できるようにする</h2><div class="cell output-location-slide">
+<div class="cell-output-display">
+<p><img data-src="index_files/figure-revealjs/no-gghighlight2-1.png" width="960"></p>
+</div>
+</div></section><section id="facet-できるようにする-2" class="slide level2">
+<h2>facet できるようにする</h2>
+<p>今度はうまくfacetできている。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">last_plot</span>() <span class="sc">+</span></span>
+<span id="cb29-2"><a href="#cb29-2"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(type))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="index_files/figure-revealjs/no-gghighlight2-facet-1.png" width="960" class="r-stretch"></section>
+<section id="別解" class="slide level2">
+<h2>別解</h2>
+<p>あまり知られていないが、<code>geom_*()</code>の<code>data</code>引数には関数を指定することもできる。 その場合、<code>ggplot()</code>に指定されているデータにその関数を適用した結果が使われる。</p>
+<p>なので、例えば、こういうデータを絞り込む関数を作る関数を定義しておいて、</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>build_filter <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb30-2"><a href="#cb30-2"></a>  <span class="cf">function</span>(data) {</span>
+<span id="cb30-3"><a href="#cb30-3"></a>    data <span class="sc">|&gt;</span> <span class="fu">filter</span>(..., <span class="at">.by =</span> type)</span>
+<span id="cb30-4"><a href="#cb30-4"></a>  }</span>
+<span id="cb30-5"><a href="#cb30-5"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="別解-1" class="slide level2">
+<h2>別解</h2>
+<p>ハイライトする方のレイヤーの<code>data</code>引数に指定してもいい。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31" data-code-line-numbers="9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb31-3"><a href="#cb31-3"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">group =</span> TYPE),</span>
+<span id="cb31-4"><a href="#cb31-4"></a>    <span class="at">data =</span> bleached,</span>
+<span id="cb31-5"><a href="#cb31-5"></a>    <span class="at">colour =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>)</span>
+<span id="cb31-6"><a href="#cb31-6"></a>  ) <span class="sc">+</span></span>
+<span id="cb31-7"><a href="#cb31-7"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb31-8"><a href="#cb31-8"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">colour =</span> type),</span>
+<span id="cb31-9"><a href="#cb31-9"></a>    <span class="at">data =</span> <span class="fu">build_filter</span>(<span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">20</span>)</span>
+<span id="cb31-10"><a href="#cb31-10"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="別解-1-output" class="slide level2 output-location-slide"><h2>別解</h2><div class="cell output-location-slide">
+<div class="cell-output-display">
+<p><img data-src="index_files/figure-revealjs/no-gghighlight3-1.png" width="960"></p>
+</div>
+</div></section><section id="別解-2" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">別解</h2>
+<p>こうしておくと、ちょっと条件を変えたくなってもここだけ書き換えればよくて便利</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32" data-code-line-numbers="9"><pre class="sourceCode numberSource r number-lines code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb32-1" class="hljs-ln-code"><a href="#cb32-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb32-2" class="hljs-ln-code"><a href="#cb32-2"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb32-3" class="hljs-ln-code"><a href="#cb32-3"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">group =</span> TYPE),</span>
+<span id="cb32-4" class="hljs-ln-code"><a href="#cb32-4"></a>    <span class="at">data =</span> bleached,</span>
+<span id="cb32-5" class="hljs-ln-code"><a href="#cb32-5"></a>    <span class="at">colour =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>)</span>
+<span id="cb32-6" class="hljs-ln-code"><a href="#cb32-6"></a>  ) <span class="sc">+</span></span>
+<span id="cb32-7" class="hljs-ln-code"><a href="#cb32-7"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb32-8" class="hljs-ln-code"><a href="#cb32-8"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">colour =</span> type),</span>
+<span id="cb32-9" class="hljs-ln-code"><a href="#cb32-9"></a>    <span class="at">data =</span> <span class="fu">build_filter</span>(<span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">20</span>)</span>
+<span id="cb32-10" class="hljs-ln-code"><a href="#cb32-10"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="別解-3" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">別解</h2>
+<p>こうしておくと、ちょっと条件を変えたくなってもここだけ書き換えればよくて便利</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33" data-code-line-numbers="9"><pre class="sourceCode numberSource r number-lines code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb33-1" class="hljs-ln-code"><a href="#cb33-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb33-2" class="hljs-ln-code"><a href="#cb33-2"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb33-3" class="hljs-ln-code"><a href="#cb33-3"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">group =</span> TYPE),</span>
+<span id="cb33-4" class="hljs-ln-code"><a href="#cb33-4"></a>    <span class="at">data =</span> bleached,</span>
+<span id="cb33-5" class="hljs-ln-code"><a href="#cb33-5"></a>    <span class="at">colour =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>)</span>
+<span id="cb33-6" class="hljs-ln-code"><a href="#cb33-6"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-7" class="hljs-ln-code"><a href="#cb33-7"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb33-8" class="hljs-ln-code"><a href="#cb33-8"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">colour =</span> type),</span>
+<span id="cb33-9" class="hljs-ln-code"><a href="#cb33-9"></a>    <span class="at">data =</span> <span class="fu">build_filter</span>(<span class="fu">max</span>(y) <span class="sc">&gt;=</span> <span class="dv">19</span>)</span>
+<span id="cb33-10" class="hljs-ln-code"><a href="#cb33-10"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="別解-4" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">別解</h2>
+<p>こうしておくと、ちょっと条件を変えたくなってもここだけ書き換えればよくて便利</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34" data-code-line-numbers="9"><pre class="sourceCode numberSource r number-lines code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb34-1" class="hljs-ln-code"><a href="#cb34-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb34-2" class="hljs-ln-code"><a href="#cb34-2"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb34-3" class="hljs-ln-code"><a href="#cb34-3"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">group =</span> TYPE),</span>
+<span id="cb34-4" class="hljs-ln-code"><a href="#cb34-4"></a>    <span class="at">data =</span> bleached,</span>
+<span id="cb34-5" class="hljs-ln-code"><a href="#cb34-5"></a>    <span class="at">colour =</span> <span class="fu">alpha</span>(<span class="st">"grey"</span>, <span class="fl">0.7</span>)</span>
+<span id="cb34-6" class="hljs-ln-code"><a href="#cb34-6"></a>  ) <span class="sc">+</span></span>
+<span id="cb34-7" class="hljs-ln-code"><a href="#cb34-7"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb34-8" class="hljs-ln-code"><a href="#cb34-8"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">colour =</span> type),</span>
+<span id="cb34-9" class="hljs-ln-code"><a href="#cb34-9"></a>    <span class="at">data =</span> <span class="fu">build_filter</span>(<span class="fu">max</span>(y) <span class="sc">&lt;=</span> <span class="dv">100</span>)</span>
+<span id="cb34-10" class="hljs-ln-code"><a href="#cb34-10"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="別解-5" class="slide level2">
+<h2>別解</h2>
+<p>（ま、こういう反復を手早くやりたくて<code>gghighlight()</code>をつくったんですけどね！）</p>
+</section>
+<section id="keep_scales-2" class="slide level2">
+<h2>keep_scales</h2>
+<p><code>keep_scales=TRUE</code>を再現するには、<code>expand_limits()</code>という便利な関数がある。 任意のaesthetic variable（<code>x</code>、<code>y</code>、<code>colour</code>、<code>fill</code>…）のスケールの範囲を拡大してくれる。</p>
+<p>データには含まれないが凡例にはラベルを表示したい、みたいなときに便利。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="fu">last_plot</span>() <span class="sc">+</span></span>
+<span id="cb35-2"><a href="#cb35-2"></a>  <span class="fu">expand_limits</span>(</span>
+<span id="cb35-3"><a href="#cb35-3"></a>    <span class="at">colour =</span> <span class="fu">unique</span>(data<span class="sc">$</span>type)</span>
+<span id="cb35-4"><a href="#cb35-4"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="keep_scales-2-output" class="slide level2 output-location-slide"><h2>keep_scales</h2><div class="cell output-location-slide">
+<div class="cell-output-display">
+<p><img data-src="index_files/figure-revealjs/no-gghighlight4-1.png" width="960"></p>
+</div>
+</div></section><section id="ggrepel-パッケージ" class="slide level2">
+<h2>ggrepel パッケージ</h2>
+</section>
+<section id="geomtextpath-パッケージ" class="slide level2">
+<h2>geomtextpath パッケージ</h2>
+</section></section>
 <section>
 <section id="references" class="title-slide slide level1 center">
 <h1>References</h1>

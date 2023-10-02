@@ -69,7 +69,14 @@ Hiroaki Yutani
 
 ## ※表記について
 
+このスライドでは合字フォントを使っています。
+慣れていないと読みづらいかもです。すみません！
 
+| 表示 | 実際の文字 |
+|------|------------|
+| `<=` |  `<` `=` （小なりイコール）  |
+| `<-` |  `<` `-` （代入）|
+| `|>` |  `|` `>` （パイプ演算子）|
 
 # **gghighlight**の使い方
 
@@ -564,23 +571,208 @@ ggplot(data, aes(x, y, colour = type)) +
 
 ## gghighlight を使わずにやってみる
 
+まず、条件を満たさない値を`NA`で置き換える。
+
 ```{r}
-#| label: "no-gghighlight"
-#| output-location: slide
 library(dplyr)
 
 data_tweak <- data |>
   mutate(
     flag = max(y) >= 20,
-    colour = if_else(flag, type, NA),
-    .by = type
+    bleached = if_else(flag, type, NA),
+    .by = type #<1>
   )
-
-ggplot(data_tweak) +
-  aes(x, y, colour = colour, group = type) +
-  geom_line() +
-  scale_colour_discrete(na.value = alpha("grey", 0.7))
 ```
+1. `type`ごとに集計
+
+## gghighlight を使わずにやってみる
+
+`NA`にグレーを割り当てる。
+
+```{r}
+#| label: "no-gghighlight1"
+#| output-location: slide
+ggplot(data_tweak) +
+  aes(x, y, colour = bleached, group = type) + #<1>
+  geom_line() +
+  scale_colour_discrete(
+    na.value = alpha("grey", 0.7) #<2>
+  )
+```
+1. `colour=bleached`だけだと`NA`で1本の線になってしまう。`group`を明示的に指定する。
+2. `NA`の値は`na.value`で指定できる。
+
+## gghighlight を使わずにやってみる
+
+このタイプの方法（色の塗り分けで対応）は、わかりやすいが、facetできないという欠点がある。
+
+```{r}
+#| label: "no-gghighlight-facet"
+last_plot() +
+  facet_wrap(vars(bleached))
+```
+
+## facet できるようにする
+
+`facet_*()`は、引数に指定した名前の列が含まれるデータは分割するが、含まれないデータは全facetに描く。
+これを利用するため、分割されないように列名を変えたバージョンをつくる。
+
+```{r}
+bleached <- data |>
+  rename(TYPE = type)
+```
+
+また、ハイライトするデータに絞ったバージョンもつくる。
+
+```{r}
+colourful <- data |>
+  filter(max(y) >= 20, .by = type)
+```
+
+## facet できるようにする
+
+この2つのデータを別々の`geom_line()`として重ね合わせる。
+
+```{r}
+#| label: "no-gghighlight2"
+#| output-location: slide
+ggplot(NULL, aes(x, y)) +
+  geom_line(
+    mapping = aes(group = TYPE),
+    data = bleached,
+    colour = alpha("grey", 0.7)
+  ) +
+  geom_line(
+    mapping = aes(colour = type),
+    data = colourful
+  )
+```
+
+## facet できるようにする
+
+今度はうまくfacetできている。
+
+```{r}
+#| label: "no-gghighlight2-facet"
+last_plot() +
+  facet_wrap(vars(type))
+```
+
+## 別解
+
+あまり知られていないが、`geom_*()`の`data`引数には関数を指定することもできる。
+その場合、`ggplot()`に指定されているデータにその関数を適用した結果が使われる。
+
+なので、例えば、こういうデータを絞り込む関数を作る関数を定義しておいて、
+
+```{r}
+build_filter <- function(...) {
+  function(data) {
+    data |> filter(..., .by = type)
+  }
+}
+```
+
+## 別解
+
+ハイライトする方のレイヤーの`data`引数に指定してもいい。
+
+```{r}
+#| label: "no-gghighlight3"
+#| output-location: slide
+#| code-line-numbers: "9"
+ggplot(data, aes(x, y)) +
+  geom_line(
+    mapping = aes(group = TYPE),
+    data = bleached,
+    colour = alpha("grey", 0.7)
+  ) +
+  geom_line(
+    mapping = aes(colour = type),
+    data = build_filter(max(y) >= 20)
+  )
+```
+## 別解 {auto-animate="true"}
+
+こうしておくと、ちょっと条件を変えたくなってもここだけ書き換えればよくて便利
+
+```{r}
+#| eval: false
+#| code-line-numbers: "9"
+ggplot(data, aes(x, y)) +
+  geom_line(
+    mapping = aes(group = TYPE),
+    data = bleached,
+    colour = alpha("grey", 0.7)
+  ) +
+  geom_line(
+    mapping = aes(colour = type),
+    data = build_filter(max(y) >= 20)
+  )
+```
+
+## 別解 {auto-animate="true"}
+
+こうしておくと、ちょっと条件を変えたくなってもここだけ書き換えればよくて便利
+
+```{r}
+#| eval: false
+#| code-line-numbers: "9"
+ggplot(data, aes(x, y)) +
+  geom_line(
+    mapping = aes(group = TYPE),
+    data = bleached,
+    colour = alpha("grey", 0.7)
+  ) +
+  geom_line(
+    mapping = aes(colour = type),
+    data = build_filter(max(y) >= 19)
+  )
+```
+
+## 別解 {auto-animate="true"}
+
+こうしておくと、ちょっと条件を変えたくなってもここだけ書き換えればよくて便利
+
+```{r}
+#| eval: false
+#| code-line-numbers: "9"
+ggplot(data, aes(x, y)) +
+  geom_line(
+    mapping = aes(group = TYPE),
+    data = bleached,
+    colour = alpha("grey", 0.7)
+  ) +
+  geom_line(
+    mapping = aes(colour = type),
+    data = build_filter(max(y) <= 100)
+  )
+```
+
+## 別解
+
+（ま、こういう反復を手早くやりたくて`gghighlight()`をつくったんですけどね！）
+
+## keep_scales
+
+`keep_scales=TRUE`を再現するには、`expand_limits()`という便利な関数がある。
+任意のaesthetic variable（`x`、`y`、`colour`、`fill`...）のスケールの範囲を拡大してくれる。
+
+データには含まれないが凡例にはラベルを表示したい、みたいなときに便利。
+
+```{r}
+#| label: "no-gghighlight4"
+#| output-location: slide
+last_plot() +
+  expand_limits(
+    colour = unique(data$type)
+  )
+```
+
+## ggrepel パッケージ
+
+## geomtextpath パッケージ
+
 
 # References
 
