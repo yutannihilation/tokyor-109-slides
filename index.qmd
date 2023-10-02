@@ -19,13 +19,16 @@ execute:
 knitr::opts_chunk$set(dev = "ragg_png")
 
 library(ggplot2)
-library(ggrepel)
 library(patchwork)
 
-update_geom_defaults("label_repel", list(size = 20 / .pt))
 theme_set(theme_gray(base_size = 20))
-
 update_geom_defaults("point", list(size = 3))
+
+library(ggrepel)
+update_geom_defaults("label_repel", list(size = 20 / .pt))
+
+library(geomtextpath)
+update_geom_defaults("textpath", list(size = 20 / .pt))
 ```
 
 
@@ -64,7 +67,11 @@ Hiroaki Yutani
 * gghighlightの使い方
 * gghighlightを使わずにやるとどうなるか
 
-# <b>gghighlight</b>の使い方
+## ※表記について
+
+
+
+# **gghighlight**の使い方
 
 ## gghighlightとは
 
@@ -171,7 +178,7 @@ gghighlight(max(y) >= 20, min(y) >= 0)
 gghighlight(n() > 100)
 ```
 
-## `geom_bar()`の例
+## geom_bar() の例
 
 `price`の平均が4000以上をハイライト
 
@@ -194,7 +201,7 @@ p1 + ggtitle("before")
 p2 + ggtitle("after")
 ```
 
-## `geom_point()`の例
+## geom_point() の例
 
 `disp`が200以上をハイライト
 
@@ -220,7 +227,7 @@ p2 + ggtitle("after")
 ```
 
 
-## `geom_sf()`の例
+## geom_sf() の例
 
 `AREA`が0.20以上をハイライト
 
@@ -251,7 +258,7 @@ p2 + ggtitle("after")
 * 正確には、「同じデータからは必ず同じ図形が描かれる」なら使える
   * 既知のダメな例は`position_dodge()`
 
-## `geom_boxplot()`の例
+## geom_boxplot() の例
 
 ひとつのboxplotの幅は、その目盛りで横並びになるべきカテゴリの数で決まる。
 絞り込まれてカテゴリ数が変わると、幅が違ってうまく重ならない。
@@ -288,9 +295,9 @@ ggplot(mpg, aes(class, hwy, colour = cyl)) +
 
 * えっ、難しくてどっちを選べばいいかわからない...><
 
-→ `gghighlight()`は自動でどっちの計算も試して、うまくいった方を採用するので雰囲気で使って大丈夫！
+→ `gghighlight()`は自動でどっちの計算も試して、うまくいった方を採用するので、雰囲気で使って大丈夫！
 
-## `use_group_by`
+## use_group_by
 
 * 自動で計算してくれるのはありがたいんですが、この警告メッセージがうざいんですけど
 
@@ -310,7 +317,7 @@ ggplot(mpg, aes(class, hwy, colour = cyl)) +
 ```
 
 
-## `TRUE`/`FALSE`がすべてではない
+## TRUE / FALSE がすべてではない
 
 ここまで、わかりやすいように「条件」と書いてきたが、実は`TRUE`/`FALSE`でなくてもいい
 
@@ -340,9 +347,9 @@ ggplot(mtcars, aes(wt, mpg, colour = cyl)) +
 * gghighlightのメインの目的は**データの探索**
 * gghighlightはただのショートカットで、gghighlightでできることはgghighlightを使わなくてもできる
 
-→ 複雑な図をつくりたいのであれば、gghighlightを使わないでやった方がいいかも
+→ 複雑な図をつくりたいのであれば、gghighlightを使わないでやった方がいいかも...
 
-## `gghighlight()`の結果はggplot
+## gghighlight() の結果は ggplot
 
 `+`でテーマを変えたり、patchworkしたりできる。
 
@@ -367,7 +374,7 @@ p2 <- p1 + gghighlight(max(y) > 19) +
 patchwork::wrap_plots(p1, p2)
 ```
 
-## facetが便利
+## facet が便利
 
 グレーになった部分は全facetに表示される
 
@@ -376,7 +383,7 @@ patchwork::wrap_plots(p1, p2)
 p2 + facet_wrap(vars(type))
 ```
 
-## facetが便利
+## facet が便利
 
 なんなら、このためだけに空の`gghighlight()`を使うまである
 
@@ -391,26 +398,29 @@ ggplot(mpg, aes(displ, hwy, colour = cyl)) +
   facet_wrap(vars(cyl))
 ```
 
-## `unhighlighted_params`
+## unhighlighted_params
 
 グレーアウト部分の任意のパラメータを上書きできる
-
-```{r}
-#| label: "params"
-#| output-location: slide
-ggplot(data, aes(x, y, colour = type)) +
-  geom_line(linewidth = 3, alpha = 0.7) +    # <1>
-  gghighlight(max(y) > 19,
-    unhighlighted_params = list(
-      linewidth = 1             # <2>
-    )
-  )
-```
 
 1. 元の`linewidth`は太目に
 2. グレーアウト部分の`linewidth`は細目で上書きする
 
-## `unhighlighted_params`
+```{r}
+#| label: "params"
+#| code-line-numbers: "|2|4-6"
+#| output-location: slide
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line(linewidth = 3, alpha = 0.7) +
+  gghighlight(max(y) > 19,
+    unhighlighted_params = list(
+      linewidth = 1
+    )
+  )
+```
+
+
+
+## unhighlighted_params
 
 `NULL`を指定してグレーアウトを取り消すこともできる
 
@@ -433,10 +443,10 @@ ggplot(data, aes(x, y, colour = type)) +
 2. ただし透明度を上げる
 3. （次に説明）
 
-## `keep_scales`
+## keep_scales
 
 `gghighlight()`は、絞り込んだ後のデータに色を割り当てるので、元のプロットの色とは一致しない。
-`keep_scales = TRUE`を指定すれば、元の色と合わせることができる。
+`keep_scales=TRUE`を指定すれば、元の色と合わせることができる。
 
 ```{r}
 mtcars$cyl <- factor(mtcars$cyl)
@@ -448,7 +458,7 @@ B <- A + gghighlight(disp)
 C <- A +
   gghighlight(disp, keep_scales = TRUE)
 ```
-## `keep_scales`
+## keep_scales
 
 ```{r}
 #| label: "keep_scales"
@@ -457,7 +467,7 @@ C <- A +
 wrap_plots(A, B, C) + plot_annotation(tag_levels = "A")
 ```
 
-## `gghighlight()`は順序が重要
+## gghighlight() は順序が重要
 
 `gghighlight()`は通常のggplotの関数と同じく`+`で足せるが、**中身はぜんぜん違う**
 
@@ -465,11 +475,13 @@ wrap_plots(A, B, C) + plot_annotation(tag_levels = "A")
 * なので、`gghighlight()`より後に`+`されたレイヤーに対しては`gghighlight()`の力は及ばない
 * ただし、ggplotオブジェクトが保持するデータは条件を満たすもののみに絞り込まれているので、元のデータを参照するには`data`引数に元のデータを渡す必要がある
 
-## `gghighlight()`は順序が重要
+## gghighlight() は順序が重要
+
 
 ```{r}
 #| label: "order-of-gghighlight"
 #| output-location: slide
+#| code-line-numbers: "|10|8-9|11"
 data2 <- tibble::tibble(
   x = rep(1:3, each = 3),
   type = rep(1:3, times = 3),
@@ -480,12 +492,99 @@ data2$type <- factor(data2$type)
 ggplot(data2, aes(x, y, colour = type)) +
   geom_line() +
   gghighlight(max(y) >= 9) +
-  geom_point(data = data2) # <1>
+  geom_point(data = data2)
 ```
-1. このレイヤーはグレーアウトしない
 
-## ラベルをカスタマイズする
+::: {.fragment}
 
-* `use_direct_label`
-* `label_params`
-* `line_label_type`
+→ `geom_point()`はカラフルなまま
+
+:::
+
+
+
+## ラベルのカスタマイズ小ネタ集
+
+* gghighlightは、なるべく凡例の代わりに直接ラベルを付けるようにするが、`use_direct_label=FALSE`にすると常に凡例を表示する
+* ラベルは`label_params`でカスタマイズできる
+* `geom_line()`へのラベルのつけ方は`line_label_type`で変えられる
+
+## "ggrepel_label"（デフォルト）
+
+ggrepelパッケージを使う
+
+```{r}
+#| label: "ggrepel_label"
+#| code-line-numbers: "4"
+#| output-location: slide
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line() +
+  gghighlight(max(y) >= 20,
+    line_label_type = "ggrepel_label"
+  )
+```
+
+## "sec_axis"
+
+secondary axisをおしゃれに使う
+
+* 欠点：値が近いところにあると、重なってしまって読みづらい
+
+```{r}
+#| label: "sec_axis"
+#| code-line-numbers: "4"
+#| output-location: slide
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line() +
+  gghighlight(max(y) >= 20,
+    line_label_type = "sec_axis"
+  )
+```
+
+## "text_path"
+
+geomtextpathパッケージを使う
+
+* 欠点：線が曲がりくねったり重なったりすると読みづらい
+
+```{r}
+#| label: "text_path"
+#| code-line-numbers: "4"
+#| output-location: slide
+ggplot(data, aes(x, y, colour = type)) +
+  geom_line() +
+  gghighlight(max(y) >= 20,
+    line_label_type = "text_path"
+  )
+```
+
+# **gghighlight**を支える技術
+
+（ここからはマニア向けなので気軽に聞いてください）
+
+## gghighlight を使わずにやってみる
+
+```{r}
+#| label: "no-gghighlight"
+#| output-location: slide
+library(dplyr)
+
+data_tweak <- data |>
+  mutate(
+    flag = max(y) >= 20,
+    colour = if_else(flag, type, NA),
+    .by = type
+  )
+
+ggplot(data_tweak) +
+  aes(x, y, colour = colour, group = type) +
+  geom_line() +
+  scale_colour_discrete(na.value = alpha("grey", 0.7))
+```
+
+# References
+
+## {}
+
+* [Plotting background data for groups with ggplot2](https://drsimonj.svbtle.com/plotting-background-data-for-groups-with-ggplot2)
+* [Label line ends in time series with ggplot2](https://drsimonj.svbtle.com/label-line-ends-in-time-series-with-ggplot2)
