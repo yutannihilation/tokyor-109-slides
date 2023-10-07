@@ -46,10 +46,20 @@ Hiroaki Yutani
 - Twitter: [@yutannihilation](https://twitter.com/yutannihilation)
 - 好きな言語：R、忍殺語
 - ggplot2 のメンテナ
-- 「Rユーザのための RStudio［実践］入門」のデータ前処理の章を担当
+- 「Rユーザのための RStudio［実践］入門」のdplyr/tidyrの章を担当
 
 :::
 :::
+
+## ggplot2のメンテナ
+
+あまり大したことしてないですが、細かいバグを直したりとかしてます（最近あんまやれてない）
+
+[![](./images/contributors.png)](https://github.com/tidyverse/ggplot2/graphs/contributors)
+
+## Rユーザのための RStudio［実践］入門
+
+[![](./images/rstudio_book.jpg)](https://gihyo.jp/book/2021/978-4-297-12170-9)
 
 ## あれから5年...
 
@@ -263,7 +273,7 @@ p2 + ggtitle("after")
 
 * だいたい使えるはず
 * 正確には、「同じデータからは必ず同じ図形が描かれる」なら使える
-  * 既知のダメな例は`position_dodge()`
+  * ダメな例: `position_dodge()`、`position_jitter()`
 
 ## geom_boxplot() の例
 
@@ -283,6 +293,38 @@ ggplot(mpg, aes(class, hwy, colour = cyl)) +
     )
   )
 ```
+
+## geom_jitter() の例 {auto-animate="true"}
+
+ランダムにずれるので重ならない
+
+```{r}
+#| label: "geom_jitter"
+#| output-location: slide
+d_jitter <- data.frame(x = rep(1, 20))
+
+set.seed(1)
+ggplot(d_jitter, aes(x, x)) +
+  geom_jitter(size = 10) +
+  gghighlight()
+```
+
+## geom_jitter() の例 {auto-animate="true"}
+
+`seed`を固定すると大丈夫
+
+```{r}
+#| label: "geom_jitter_ok"
+#| output-location: slide
+#| code-line-numbers: "4"
+ggplot(d_jitter, aes(x, x)) +
+  geom_point(
+    size = 10,
+    position = position_jitter(seed = 1)
+  ) +
+  gghighlight()
+```
+
 
 ## 条件の種類
 
@@ -324,7 +366,7 @@ ggplot(mpg, aes(class, hwy, colour = cyl)) +
 ```
 
 
-## TRUE / FALSE がすべてではない
+## TRUE / FALSE じゃなくても OK
 
 ここまで、わかりやすいように「条件」と書いてきたが、実は`TRUE`/`FALSE`でなくてもいい
 
@@ -771,8 +813,51 @@ last_plot() +
 
 ## ggrepel パッケージ
 
+かぶらないように自動で位置を調整してくれる版の`geom_text()`・`geom_label()`
+
+```{r}
+#| label: "ggrepel"
+#| echo: false
+library(ggrepel)
+library(dplyr)
+set.seed(99)
+sw <- slice_sample(starwars, n = 28)
+
+ggplot(sw, aes(height, mass, label = name)) +
+  geom_point(color = "red") +
+  geom_label_repel(max.overlaps = 100, box.padding = 1)
+```
+
+
 ## geomtextpath パッケージ
 
+パスに従ってテキストを配置してくれるパッケージ
+
+```{r}
+#| label: "geomtestpath"
+#| echo: false
+library(geomtextpath)
+
+t <- seq(5, -1, length.out = 1000) * pi
+spiral <- data.frame(
+  x = sin(t) * 1:1000,
+  y = cos(t) * 1:1000
+)
+rhyme <- "拙者、親方と申すは、お立ち会いの内に、ご存じのお方もございましょうが、お江戸を立って、二十里上方、相州小田原、一色町を、お過ぎなされて、青物町を、登りへお出でなさるれば、欄干橋、虎屋、藤右衛門、只今は剃髪いたして、円斎と名乗りまする。元朝より、大つごもりまで、お手に入れまするこの薬は、昔、陳の国の唐人外郎という人..."
+ggplot(spiral, aes(x, y)) +
+  geom_textpath(size = 4, label = rhyme, family = "Noto Sans JP")
+```
+
+# まとめ
+
+## まとめ
+
+* `+ gghighlight()`でお手軽にハイライトできるのでぜひ使ってください
+* gghighlightはただのショートカットなので別に使わなくても同じことできます
+
+## Thank you!
+
+![](./images/bouncing_ball-.gif)
 
 # References
 

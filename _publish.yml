@@ -1,0 +1,4 @@
+- source: index.qmd
+  quarto-pub:
+    - id: e7890c11-92ff-4918-b6b1-54d2b9dc4977
+      url: 'https://yutani.quarto.pub/tokyor-109-gghighlight'
